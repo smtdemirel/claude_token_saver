@@ -1,13 +1,13 @@
-# AGENTS.md
+# CLAUDE.md
 # AI Coding Agent Master Rules — v1.0
-# Priority: AGENTS.md > PROJECT_RULES.md > docs/ (query-on-demand)
+# Priority: CLAUDE.md > PROJECT_RULES.md > docs/ (query-on-demand)
 
 ---
 
 ## Identity & Priority
 
 This file governs all agent behavior in this project. Reading order:
-1. `AGENTS.md` (this file) — baseline, always active
+1. `CLAUDE.md` (this file) — baseline, always active
 2. `PROJECT_RULES.md` — project overrides; take precedence over this file
 3. `docs/` — extended reference; **do NOT read proactively**
 

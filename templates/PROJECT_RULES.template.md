@@ -1,6 +1,6 @@
 # PROJECT_RULES.md
-# Project-specific overrides for AGENTS.md
-# Rules here take precedence over AGENTS.md.
+# Project-specific overrides for CLAUDE.md
+# Rules here take precedence over CLAUDE.md.
 # Delete any section you don't need — blank sections inherit defaults.
 
 ---

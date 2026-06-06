@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 # Minimal starter template — copy to your project root.
 # Extend with PROJECT_RULES.md for project-specific overrides.
 
@@ -6,7 +6,7 @@
 
 ## Priority
 
-1. `AGENTS.md` (this file) — always active
+1. `CLAUDE.md` (this file) — always active
 2. `PROJECT_RULES.md` — project overrides; take precedence
 3. `docs/` — extended reference; query on demand: `db/query-rules.sh <keyword>`
 

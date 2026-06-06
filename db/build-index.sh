@@ -71,7 +71,7 @@ PYEOF
 # Index all relevant markdown files
 indexed=0
 for md in \
-  "$ROOT/AGENTS.md" \
+  "$ROOT/CLAUDE.md" \
   "$ROOT/PROJECT_RULES.md" \
   "$ROOT/docs/"*.md; do
   if [[ -f "$md" ]]; then

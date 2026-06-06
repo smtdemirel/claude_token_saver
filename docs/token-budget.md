@@ -11,7 +11,7 @@ Reading entire rule files at session start wastes context window space with cont
 
 | Source | When to load |
 |--------|-------------|
-| `AGENTS.md` | Always (it is short by design) |
+| `CLAUDE.md` | Always (it is short by design) |
 | `PROJECT_RULES.md` | Once at session start |
 | `docs/*.md` | On demand via `db/query-rules.sh` only |
 

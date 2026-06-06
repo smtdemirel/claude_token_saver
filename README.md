@@ -9,7 +9,7 @@ Drop it into any project and Claude follows consistent, professional engineering
 
 | File | Purpose |
 |------|---------|
-| `AGENTS.md` | Master agent rules — Claude reads this automatically |
+| `CLAUDE.md` | Master agent rules — Claude reads this automatically |
 | `PROJECT_RULES.md` | Your project-specific overrides (fill this in) |
 | `docs/` | Extended rules loaded on demand via FTS5 |
 | `db/` | SQLite FTS5 index — token-efficient rule lookup |
@@ -47,7 +47,7 @@ bash .claude-token-saver/install.sh .
 ### Option C — Manual copy
 
 ```bash
-cp AGENTS.md /path/to/your/project/
+cp CLAUDE.md /path/to/your/project/
 cp -r docs/ db/ /path/to/your/project/
 cp templates/PROJECT_RULES.template.md /path/to/your/project/PROJECT_RULES.md
 # Edit PROJECT_RULES.md, then rebuild:
@@ -58,13 +58,13 @@ cp templates/PROJECT_RULES.template.md /path/to/your/project/PROJECT_RULES.md
 
 ## How It Works
 
-### 1. Claude reads `AGENTS.md` automatically
+### 1. Claude reads `CLAUDE.md` automatically
 
-Claude Code discovers `AGENTS.md` in the project root and follows its rules in every conversation. The file is kept short (~200 lines) — it covers all disciplines without bloating context.
+Claude Code discovers `CLAUDE.md` in the project root and follows its rules in every conversation. The file is kept short (~200 lines) — it covers all disciplines without bloating context.
 
 ### 2. `PROJECT_RULES.md` overrides the base rules
 
-Fill in your stack, team conventions, and any rule overrides. Claude checks this file and gives it precedence over `AGENTS.md`.
+Fill in your stack, team conventions, and any rule overrides. Claude checks this file and gives it precedence over `CLAUDE.md`.
 
 ### 3. `docs/` is loaded on demand via SQLite FTS5
 
@@ -85,7 +85,7 @@ This saves **60-70% of token consumption** from rule loading.
 
 ```bash
 # Pull latest base rules
-git -C ~/claude-rules pull
+git -C ~/claude-token-saver pull
 
 # Re-install (PROJECT_RULES.md is preserved)
 bash ~/claude-token-saver/install.sh /path/to/your/project
@@ -95,7 +95,7 @@ bash ~/claude-token-saver/install.sh /path/to/your/project
 
 ## Customizing
 
-1. **Do NOT edit `AGENTS.md` directly** — use `PROJECT_RULES.md` for overrides.
+1. **Do NOT edit `CLAUDE.md` directly** — use `PROJECT_RULES.md` for overrides.
 2. Add project-specific rules under the appropriate section in `PROJECT_RULES.md`.
 3. Add domain-specific docs to `docs/your-topic.md` — they'll be auto-indexed.
 4. Re-run `db/build-index.sh` after any docs change.
@@ -106,7 +106,7 @@ bash ~/claude-token-saver/install.sh /path/to/your/project
 
 ```
 claude-token-saver/
-├── AGENTS.md                    ← Master rules (always read)
+├── CLAUDE.md                    ← Master rules (always read)
 ├── PROJECT_RULES.md             ← Your overrides (always read)
 ├── README.md                    ← This file
 ├── install.sh                   ← Setup script
@@ -142,7 +142,7 @@ See [SQLite FTS5 documentation](https://www.sqlite.org/fts5.html) for advanced q
 ## Contributing
 
 1. Fork and clone.
-2. Edit rule files in `docs/` or `AGENTS.md`.
+2. Edit rule files in `docs/` or `CLAUDE.md`.
 3. Run `db/build-index.sh` to verify indexing works.
 4. Run `db/query-rules.sh "your topic"` to verify search works.
 5. Submit a PR with a clear description of what rule was added/changed and why.
