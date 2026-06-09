@@ -14,6 +14,7 @@ Drop it into any project and Claude follows consistent, professional engineering
 | `docs/` | Extended rules loaded on demand via FTS5 |
 | `db/` | SQLite FTS5 index — token-efficient rule lookup |
 | `install.sh` | One-command setup for any project |
+| `update.sh` | One-command update (preserves your PROJECT_RULES.md) |
 | `templates/` | Minimal starters for new projects |
 
 ---
@@ -43,6 +44,14 @@ cd your-project
 git submodule add https://github.com/smtdemirel/claude_token_saver.git .claude-token-saver
 bash .claude-token-saver/install.sh .
 ```
+
+Güncelleme almak için (ne zaman istersen):
+```bash
+git submodule update --remote .claude-token-saver
+bash .claude-token-saver/update.sh .
+```
+
+`update.sh` şunları yapar: dosyaları günceller, `PROJECT_RULES.md`'yi olduğu gibi korur, FTS5 indexini yeniden oluşturur.
 
 ### Option C — Manual copy
 
@@ -81,15 +90,51 @@ This saves **60-70% of token consumption** from rule loading.
 
 ---
 
-## Keeping Rules Up to Date
+## Getting Notified of Updates
+
+### GitHub Watch (herkes için)
+
+GitHub repo sayfasında **Watch → Custom → Releases** seç. Yeni bir release yayınlandığında email alırsın.
+
+### Dependabot (Option B — submodule kullanıcıları için)
+
+`templates/dependabot.yml` dosyasını projenin `.github/dependabot.yml` olarak kopyala:
 
 ```bash
-# Pull latest base rules
-git -C ~/claude-token-saver pull
-
-# Re-install (PROJECT_RULES.md is preserved)
-bash ~/claude-token-saver/install.sh /path/to/your/project
+mkdir -p .github
+cp .claude-token-saver/templates/dependabot.yml .github/dependabot.yml
+git add .github/dependabot.yml && git commit -m "chore: add dependabot for claude-token-saver"
 ```
+
+Dependabot haftada bir submodule'ü kontrol eder ve yeni commit varsa **otomatik PR açar**. PR'ı merge edince:
+
+```bash
+bash .claude-token-saver/update.sh .
+```
+
+---
+
+## Keeping Rules Up to Date
+
+### Option A — Standalone clone
+
+```bash
+bash ~/claude-token-saver/update.sh /path/to/your-project
+```
+
+Bu tek komut: repoyu günceller, dosyaları kopyalar, `PROJECT_RULES.md`'yi korur, index'i yeniler.
+
+### Option B — Git submodule
+
+```bash
+# 1. Submodule'ü en son commit'e çek
+git submodule update --remote .claude-token-saver
+
+# 2. Dosyaları projeye uygula
+bash .claude-token-saver/update.sh .
+```
+
+`PROJECT_RULES.md` her iki durumda da asla üzerine yazılmaz.
 
 ---
 
@@ -110,6 +155,7 @@ claude-token-saver/
 ├── PROJECT_RULES.md             ← Your overrides (always read)
 ├── README.md                    ← This file
 ├── install.sh                   ← Setup script
+├── update.sh                    ← Update script (preserves PROJECT_RULES.md)
 ├── docs/
 │   ├── code-style.md           ← Code style (query on demand)
 │   ├── architecture.md         ← Architecture patterns

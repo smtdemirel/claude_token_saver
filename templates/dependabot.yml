@@ -1,0 +1,16 @@
+# Dependabot config for projects using claude-token-saver as a git submodule.
+# Copy this file to your project's .github/dependabot.yml
+#
+# Dependabot will check weekly for new commits in the submodule and open a PR automatically.
+# When you merge the PR, run: bash .claude-token-saver/update.sh .
+
+version: 2
+updates:
+  - package-ecosystem: "gitsubmodules"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "claude-token-saver"
