@@ -6,12 +6,17 @@
 
 set -euo pipefail
 
+command -v python3 &>/dev/null || exit 0
+
 INPUT=$(cat)
 
 TOOL_NAME=$(python3 -c "
 import sys, json
-d = json.load(sys.stdin)
-print(d.get('tool_name', ''))
+try:
+    d = json.load(sys.stdin)
+    print(d.get('tool_name', ''))
+except Exception:
+    print('')
 " <<< "$INPUT")
 
 # Target: Bash and Read tools (most likely to produce large outputs)
@@ -20,9 +25,12 @@ print(d.get('tool_name', ''))
 # Check output size — only inject reminder if output is substantial
 OUTPUT_LEN=$(python3 -c "
 import sys, json
-d = json.load(sys.stdin)
-output = d.get('tool_response', '') or d.get('tool_result', '') or ''
-print(len(str(output)))
+try:
+    d = json.load(sys.stdin)
+    output = d.get('tool_response', '') or d.get('tool_result', '') or ''
+    print(len(str(output)))
+except Exception:
+    print(0)
 " <<< "$INPUT" 2>/dev/null || echo "0")
 
 # Skip if output is short (< 1500 chars ≈ ~375 tokens)

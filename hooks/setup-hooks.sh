@@ -11,6 +11,12 @@ SETTINGS="$SETTINGS_DIR/settings.json"
 
 mkdir -p "$SETTINGS_DIR"
 
+if ! command -v python3 &>/dev/null; then
+  echo "Error: python3 is required to register hooks." >&2
+  echo "  Install python3 and re-run: hooks/setup-hooks.sh" >&2
+  exit 1
+fi
+
 python3 - "$SETTINGS" <<'PYEOF'
 import sys, json, os
 

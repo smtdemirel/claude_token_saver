@@ -17,8 +17,10 @@ git_safe() { git -C "$ROOT" "$@" 2>/dev/null || true; }
 # Read a field from PROJECT_RULES.md (e.g. "Language:")
 rules_field() {
   local field="$1"
-  grep -i "^[-*]\s*$field" "$ROOT/PROJECT_RULES.md" 2>/dev/null \
-    | head -1 | sed 's/.*:\s*//' | sed 's/#.*//' | xargs || echo "—"
+  local val
+  val=$(grep -i "^[-*]\s*$field" "$ROOT/PROJECT_RULES.md" 2>/dev/null \
+    | head -1 | sed 's/.*:\s*//' | sed 's/#.*//' | xargs)
+  echo "${val:-—}"
 }
 
 # ── Collect data ───────────────────────────────────────────────────────────

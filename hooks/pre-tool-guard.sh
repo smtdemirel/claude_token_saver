@@ -6,12 +6,17 @@
 
 set -euo pipefail
 
+command -v python3 &>/dev/null || exit 0
+
 INPUT=$(cat)
 
 TOOL_NAME=$(python3 -c "
 import sys, json
-d = json.load(sys.stdin)
-print(d.get('tool_name', ''))
+try:
+    d = json.load(sys.stdin)
+    print(d.get('tool_name', ''))
+except Exception:
+    print('')
 " <<< "$INPUT")
 
 # Only intercept Bash tool calls
@@ -19,8 +24,11 @@ print(d.get('tool_name', ''))
 
 COMMAND=$(python3 -c "
 import sys, json
-d = json.load(sys.stdin)
-print(d.get('tool_input', {}).get('command', ''))
+try:
+    d = json.load(sys.stdin)
+    print(d.get('tool_input', {}).get('command', ''))
+except Exception:
+    print('')
 " <<< "$INPUT")
 
 WARN=""

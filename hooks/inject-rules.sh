@@ -11,19 +11,27 @@
 
 set -euo pipefail
 
+command -v python3 &>/dev/null || exit 0
+
 INPUT=$(cat)
 
 # Extract prompt and working directory from Claude Code's hook input
 PROMPT=$(python3 -c "
 import sys, json
-d = json.load(sys.stdin)
-print(d.get('prompt', ''))
+try:
+    d = json.load(sys.stdin)
+    print(d.get('prompt', ''))
+except Exception:
+    print('')
 " <<< "$INPUT")
 
 CWD=$(python3 -c "
 import sys, json
-d = json.load(sys.stdin)
-print(d.get('cwd', '.'))
+try:
+    d = json.load(sys.stdin)
+    print(d.get('cwd', '.'))
+except Exception:
+    print('.')
 " <<< "$INPUT")
 
 DB="$CWD/db/rules.db"

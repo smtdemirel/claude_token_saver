@@ -36,7 +36,7 @@ fi
 # 3. docs/ — extended rule reference
 mkdir -p "$TARGET/docs"
 cp "$RULES_DIR/docs/"*.md "$TARGET/docs/" 2>/dev/null || true
-echo "  [✓] docs/ (code-style, architecture, testing, security, token-budget)"
+echo "  [✓] docs/ (code-style, architecture, testing, security, token-budget, error-handling, git-workflow)"
 
 # 4. db/ — FTS5 index tooling
 mkdir -p "$TARGET/db"
@@ -58,7 +58,13 @@ cp "$RULES_DIR/scripts/snapshot.sh" "$TARGET/scripts/snapshot.sh"
 chmod +x "$TARGET/scripts/snapshot.sh"
 echo "  [✓] scripts/snapshot.sh"
 
-# 6. Build initial FTS5 index
+# 7. update.sh + VERSION — enable one-command future updates
+cp "$RULES_DIR/update.sh" "$TARGET/update.sh"
+cp "$RULES_DIR/VERSION"   "$TARGET/VERSION"
+chmod +x "$TARGET/update.sh"
+echo "  [✓] update.sh + VERSION"
+
+# 8. Build initial FTS5 index
 echo ""
 if command -v sqlite3 &>/dev/null; then
   echo "Building FTS5 rule index..."
@@ -68,11 +74,11 @@ else
   echo "  Install sqlite3 and run: $TARGET/db/build-index.sh"
 fi
 
-# 7. Generate initial project snapshot
+# 9. Generate initial project snapshot
 echo "Generating project snapshot..."
 bash "$TARGET/scripts/snapshot.sh" "$TARGET"
 
-# 8. Register all Claude Code hooks
+# 10. Register all Claude Code hooks
 echo "Registering hooks..."
 bash "$TARGET/hooks/setup-hooks.sh" "$TARGET"
 
