@@ -72,11 +72,14 @@ chmod +x "$TARGET/db/build-index.sh" "$TARGET/db/query-rules.sh" "$TARGET/update
 echo "  [✓] db/ scripts updated"
 
 mkdir -p "$TARGET/hooks"
-cp "$RULES_DIR/hooks/inject-rules.sh" "$TARGET/hooks/inject-rules.sh"
-cp "$RULES_DIR/hooks/setup-hooks.sh"  "$TARGET/hooks/setup-hooks.sh"
-chmod +x "$TARGET/hooks/inject-rules.sh" "$TARGET/hooks/setup-hooks.sh"
+cp "$RULES_DIR/hooks/"*.sh "$TARGET/hooks/"
+chmod +x "$TARGET/hooks/"*.sh
+mkdir -p "$TARGET/scripts"
+cp "$RULES_DIR/scripts/snapshot.sh" "$TARGET/scripts/snapshot.sh"
+chmod +x "$TARGET/scripts/snapshot.sh"
+bash "$TARGET/scripts/snapshot.sh" "$TARGET"
 bash "$TARGET/hooks/setup-hooks.sh" "$TARGET"
-echo "  [✓] hooks/ updated and registered"
+echo "  [✓] hooks/ + scripts/ updated and registered"
 
 # Step 3: Rebuild FTS5 index with updated content.
 echo ""

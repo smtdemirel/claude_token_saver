@@ -46,12 +46,17 @@ cp "$RULES_DIR/db/query-rules.sh"   "$TARGET/db/query-rules.sh"
 chmod +x "$TARGET/db/build-index.sh" "$TARGET/db/query-rules.sh"
 echo "  [✓] db/ (FTS5 schema + scripts)"
 
-# 5. hooks/ — Claude Code UserPromptSubmit hook (guaranteed rule injection)
+# 5. hooks/ — guaranteed rule injection + context management
 mkdir -p "$TARGET/hooks"
-cp "$RULES_DIR/hooks/inject-rules.sh"  "$TARGET/hooks/inject-rules.sh"
-cp "$RULES_DIR/hooks/setup-hooks.sh"   "$TARGET/hooks/setup-hooks.sh"
-chmod +x "$TARGET/hooks/inject-rules.sh" "$TARGET/hooks/setup-hooks.sh"
-echo "  [✓] hooks/ (UserPromptSubmit rule injector)"
+cp "$RULES_DIR/hooks/"*.sh "$TARGET/hooks/"
+chmod +x "$TARGET/hooks/"*.sh
+echo "  [✓] hooks/ (session-start, inject-rules, pre-tool-guard, post-tool-trim, context-guard)"
+
+# 6. scripts/ — project snapshot generator
+mkdir -p "$TARGET/scripts"
+cp "$RULES_DIR/scripts/snapshot.sh" "$TARGET/scripts/snapshot.sh"
+chmod +x "$TARGET/scripts/snapshot.sh"
+echo "  [✓] scripts/snapshot.sh"
 
 # 6. Build initial FTS5 index
 echo ""
@@ -63,8 +68,12 @@ else
   echo "  Install sqlite3 and run: $TARGET/db/build-index.sh"
 fi
 
-# 7. Register Claude Code hook
-echo "Registering UserPromptSubmit hook..."
+# 7. Generate initial project snapshot
+echo "Generating project snapshot..."
+bash "$TARGET/scripts/snapshot.sh" "$TARGET"
+
+# 8. Register all Claude Code hooks
+echo "Registering hooks..."
 bash "$TARGET/hooks/setup-hooks.sh" "$TARGET"
 
 echo ""

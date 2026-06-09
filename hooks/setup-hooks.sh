@@ -18,6 +18,13 @@ settings_path = sys.argv[1]
 
 HOOKS_TO_REGISTER = [
     {
+        "event": "SessionStart",
+        "marker": "session-start",
+        "entry": {
+            "hooks": [{"type": "command", "command": "bash hooks/session-start.sh"}]
+        }
+    },
+    {
         "event": "UserPromptSubmit",
         "marker": "inject-rules",
         "entry": {
@@ -36,6 +43,13 @@ HOOKS_TO_REGISTER = [
         "marker": "post-tool-trim",
         "entry": {
             "hooks": [{"type": "command", "command": "bash hooks/post-tool-trim.sh"}]
+        }
+    },
+    {
+        "event": "Stop",
+        "marker": "context-guard",
+        "entry": {
+            "hooks": [{"type": "command", "command": "bash hooks/context-guard.sh"}]
         }
     },
 ]
