@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Registers the inject-rules.sh hook in the target project's .claude/settings.json
-# Safe to run multiple times — skips if already registered.
+# Registers all claude-token-saver hooks in .claude/settings.json
+# Safe to run multiple times — skips entries that already exist.
 # Usage: hooks/setup-hooks.sh [target-dir]
 
 set -euo pipefail
@@ -8,15 +8,37 @@ set -euo pipefail
 TARGET="${1:-$(pwd)}"
 SETTINGS_DIR="$TARGET/.claude"
 SETTINGS="$SETTINGS_DIR/settings.json"
-HOOK_CMD="bash hooks/inject-rules.sh"
 
 mkdir -p "$SETTINGS_DIR"
 
-python3 - "$SETTINGS" "$HOOK_CMD" <<'PYEOF'
+python3 - "$SETTINGS" <<'PYEOF'
 import sys, json, os
 
 settings_path = sys.argv[1]
-hook_cmd      = sys.argv[2]
+
+HOOKS_TO_REGISTER = [
+    {
+        "event": "UserPromptSubmit",
+        "marker": "inject-rules",
+        "entry": {
+            "hooks": [{"type": "command", "command": "bash hooks/inject-rules.sh"}]
+        }
+    },
+    {
+        "event": "PreToolUse",
+        "marker": "pre-tool-guard",
+        "entry": {
+            "hooks": [{"type": "command", "command": "bash hooks/pre-tool-guard.sh"}]
+        }
+    },
+    {
+        "event": "PostToolUse",
+        "marker": "post-tool-trim",
+        "entry": {
+            "hooks": [{"type": "command", "command": "bash hooks/post-tool-trim.sh"}]
+        }
+    },
+]
 
 # Load existing settings or start fresh
 if os.path.exists(settings_path):
@@ -28,29 +50,28 @@ if os.path.exists(settings_path):
 else:
     settings = {}
 
-# Ensure hooks structure exists
 settings.setdefault("hooks", {})
-settings["hooks"].setdefault("UserPromptSubmit", [])
 
-# Idempotency: skip if already registered
-for entry in settings["hooks"]["UserPromptSubmit"]:
-    for h in entry.get("hooks", []):
-        if "inject-rules" in h.get("command", ""):
-            print(f"  [~] Hook already registered in {settings_path}")
-            sys.exit(0)
+for hook_def in HOOKS_TO_REGISTER:
+    event   = hook_def["event"]
+    marker  = hook_def["marker"]
+    entry   = hook_def["entry"]
 
-# Add hook entry
-settings["hooks"]["UserPromptSubmit"].append({
-    "hooks": [
-        {
-            "type": "command",
-            "command": hook_cmd
-        }
-    ]
-})
+    settings["hooks"].setdefault(event, [])
+
+    # Idempotency check
+    already = any(
+        marker in h.get("command", "")
+        for e in settings["hooks"][event]
+        for h in e.get("hooks", [])
+    )
+
+    if already:
+        print(f"  [~] {event}/{marker} already registered")
+    else:
+        settings["hooks"][event].append(entry)
+        print(f"  [✓] {event}/{marker} registered")
 
 with open(settings_path, "w") as f:
     json.dump(settings, f, indent=2)
-
-print(f"  [✓] Hook registered in {settings_path}")
 PYEOF
