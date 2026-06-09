@@ -75,18 +75,28 @@ Claude Code discovers `CLAUDE.md` in the project root and follows its rules in e
 
 Fill in your stack, team conventions, and any rule overrides. Claude checks this file and gives it precedence over `CLAUDE.md`.
 
-### 3. `docs/` is loaded on demand via SQLite FTS5
+### 3. Rules are injected automatically via Claude Code Hook (guaranteed)
 
-The `docs/` folder contains detailed rule sections (~2000 tokens per file). Claude **never reads them proactively**. Instead:
+`install.sh` registers a `UserPromptSubmit` hook in `.claude/settings.json`. This hook runs **outside Claude's decision loop** — it fires automatically on every prompt, before Claude even sees the message.
 
-```bash
-# Claude (or you) runs:
-db/query-rules.sh "security"        # → returns only auth/SQL/OWASP sections
-db/query-rules.sh "test mock"       # → returns mock policy section
-db/query-rules.sh "naming boolean"  # → returns naming conventions
+**Flow:**
+```
+User types a prompt
+       ↓
+UserPromptSubmit hook fires (guaranteed)
+       ↓
+inject-rules.sh extracts keywords from the prompt
+       ↓
+Queries FTS5 index → returns only relevant rule sections (~150 tokens)
+       ↓
+Claude Code injects rules as additionalContext
+       ↓
+Claude sees prompt + relevant rules together
 ```
 
-This saves **60-70% of token consumption** from rule loading.
+**Why this is reliable:** Unlike CLAUDE.md instructions (which Claude may or may not follow), hooks execute deterministically at the OS level — Claude has no say in whether they run.
+
+**Token savings:** Only matching rule sections are injected (~150 tokens) instead of all docs files (~5,000+ tokens). The hook adds only what's relevant to the current task.
 
 ---
 
@@ -167,8 +177,11 @@ claude-token-saver/
 ├── CLAUDE.md                    ← Master rules (always read)
 ├── PROJECT_RULES.md             ← Your overrides (always read)
 ├── README.md                    ← This file
-├── install.sh                   ← Setup script
+├── install.sh                   ← Setup script (copies files + registers hook)
 ├── update.sh                    ← Update script (preserves PROJECT_RULES.md)
+├── hooks/
+│   ├── inject-rules.sh         ← UserPromptSubmit hook (FTS5 → additionalContext)
+│   └── setup-hooks.sh          ← Registers hook in .claude/settings.json
 ├── docs/
 │   ├── code-style.md           ← Code style (query on demand)
 │   ├── architecture.md         ← Architecture patterns

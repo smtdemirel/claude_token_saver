@@ -46,7 +46,14 @@ cp "$RULES_DIR/db/query-rules.sh"   "$TARGET/db/query-rules.sh"
 chmod +x "$TARGET/db/build-index.sh" "$TARGET/db/query-rules.sh"
 echo "  [✓] db/ (FTS5 schema + scripts)"
 
-# 5. Build initial index
+# 5. hooks/ — Claude Code UserPromptSubmit hook (guaranteed rule injection)
+mkdir -p "$TARGET/hooks"
+cp "$RULES_DIR/hooks/inject-rules.sh"  "$TARGET/hooks/inject-rules.sh"
+cp "$RULES_DIR/hooks/setup-hooks.sh"   "$TARGET/hooks/setup-hooks.sh"
+chmod +x "$TARGET/hooks/inject-rules.sh" "$TARGET/hooks/setup-hooks.sh"
+echo "  [✓] hooks/ (UserPromptSubmit rule injector)"
+
+# 6. Build initial FTS5 index
 echo ""
 if command -v sqlite3 &>/dev/null; then
   echo "Building FTS5 rule index..."
@@ -55,6 +62,10 @@ else
   echo "Warning: sqlite3 not found — skipping index build."
   echo "  Install sqlite3 and run: $TARGET/db/build-index.sh"
 fi
+
+# 7. Register Claude Code hook
+echo "Registering UserPromptSubmit hook..."
+bash "$TARGET/hooks/setup-hooks.sh" "$TARGET"
 
 echo ""
 echo "Done. Next steps:"

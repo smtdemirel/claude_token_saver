@@ -71,6 +71,13 @@ cp "$RULES_DIR/VERSION"             "$TARGET/VERSION" 2>/dev/null || true
 chmod +x "$TARGET/db/build-index.sh" "$TARGET/db/query-rules.sh" "$TARGET/update.sh"
 echo "  [✓] db/ scripts updated"
 
+mkdir -p "$TARGET/hooks"
+cp "$RULES_DIR/hooks/inject-rules.sh" "$TARGET/hooks/inject-rules.sh"
+cp "$RULES_DIR/hooks/setup-hooks.sh"  "$TARGET/hooks/setup-hooks.sh"
+chmod +x "$TARGET/hooks/inject-rules.sh" "$TARGET/hooks/setup-hooks.sh"
+bash "$TARGET/hooks/setup-hooks.sh" "$TARGET"
+echo "  [✓] hooks/ updated and registered"
+
 # Step 3: Rebuild FTS5 index with updated content.
 echo ""
 if command -v sqlite3 &>/dev/null; then
