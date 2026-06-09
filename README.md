@@ -119,10 +119,17 @@ bash .claude-token-saver/update.sh .
 ### Option A — Standalone clone
 
 ```bash
-bash ~/claude-token-saver/update.sh /path/to/your-project
+# Repoyu güncelle
+git -C ~/claude-token-saver pull
+
+# Projeye uygula (PROJECT_RULES.md korunur)
+bash ~/claude-token-saver/install.sh /path/to/your-project
 ```
 
-Bu tek komut: repoyu günceller, dosyaları kopyalar, `PROJECT_RULES.md`'yi korur, index'i yeniler.
+Projenizde `update.sh` zaten varsa (v1.0.0+) tek komutla yapabilirsiniz:
+```bash
+bash ~/claude-token-saver/update.sh /path/to/your-project
+```
 
 ### Option B — Git submodule
 
@@ -130,7 +137,13 @@ Bu tek komut: repoyu günceller, dosyaları kopyalar, `PROJECT_RULES.md`'yi koru
 # 1. Submodule'ü en son commit'e çek
 git submodule update --remote .claude-token-saver
 
-# 2. Dosyaları projeye uygula
+# 2. Projeye uygula (PROJECT_RULES.md korunur)
+bash .claude-token-saver/install.sh .
+```
+
+Projenizde `update.sh` zaten varsa (v1.0.0+):
+```bash
+git submodule update --remote .claude-token-saver
 bash .claude-token-saver/update.sh .
 ```
 
