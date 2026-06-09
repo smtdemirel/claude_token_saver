@@ -87,6 +87,7 @@ Fill in your stack, team conventions, and any rule overrides. Claude checks this
 | `inject-rules.sh` | UserPromptSubmit | Queries FTS5 → injects matching rule sections (~150 tokens) |
 | `pre-tool-guard.sh` | PreToolUse | Intercepts expensive Bash commands, suggests token-efficient alternatives |
 | `post-tool-trim.sh` | PostToolUse | Reminds Claude to extract only what's needed from large outputs |
+| `pre-compact.sh` | PreCompact | Refreshes project snapshot before compaction so context stays accurate |
 | `context-guard.sh` | Stop | Monitors transcript size, nudges Claude to recommend a new chat |
 
 **Why hooks are reliable:** Unlike CLAUDE.md instructions (which Claude may or may not follow), hooks execute deterministically at the OS level — Claude has no say in whether they run.
@@ -205,8 +206,9 @@ claude-token-saver/
 │   ├── inject-rules.sh         ← UserPromptSubmit: FTS5 → additionalContext
 │   ├── pre-tool-guard.sh       ← PreToolUse: blocks expensive Bash patterns
 │   ├── post-tool-trim.sh       ← PostToolUse: brevity reminder on large outputs
+│   ├── pre-compact.sh          ← PreCompact: refreshes snapshot before compaction
 │   ├── context-guard.sh        ← Stop: monitors transcript size
-│   └── setup-hooks.sh          ← Registers all hooks in .claude/settings.json
+│   └── setup-hooks.sh          ← Registers all hooks + env vars in .claude/settings.json
 ├── scripts/
 │   └── snapshot.sh             ← Generates .claude/project-snapshot.md
 ├── docs/
@@ -216,7 +218,8 @@ claude-token-saver/
 │   ├── security.md             ← OWASP checklist + rules
 │   ├── token-budget.md         ← Token optimization guide
 │   ├── error-handling.md       ← Error handling patterns
-│   └── git-workflow.md         ← Git workflow rules
+│   ├── git-workflow.md         ← Git workflow rules
+│   └── session-management.md   ← Context rot, /rewind, handoff patterns
 ├── db/
 │   ├── schema.sql              ← FTS5 table definition
 │   ├── build-index.sh          ← Parses .md files into rules.db

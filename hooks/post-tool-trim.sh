@@ -27,7 +27,7 @@ OUTPUT_LEN=$(python3 -c "
 import sys, json
 try:
     d = json.load(sys.stdin)
-    output = d.get('tool_response', '') or d.get('tool_result', '') or ''
+    output = d.get('tool_output', '') or d.get('tool_response', '') or d.get('tool_result', '') or ''
     print(len(str(output)))
 except Exception:
     print(0)

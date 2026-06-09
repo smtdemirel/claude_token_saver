@@ -52,6 +52,13 @@ HOOKS_TO_REGISTER = [
         }
     },
     {
+        "event": "PreCompact",
+        "marker": "pre-compact",
+        "entry": {
+            "hooks": [{"type": "command", "command": "bash hooks/pre-compact.sh"}]
+        }
+    },
+    {
         "event": "Stop",
         "marker": "context-guard",
         "entry": {
@@ -59,6 +66,17 @@ HOOKS_TO_REGISTER = [
         }
     },
 ]
+
+# Env vars that reduce token waste at the Claude Code level
+ENV_DEFAULTS = {
+    # Compact at 70% context fill instead of ~83.5% — avoids context rot
+    # in the final 30% where accuracy degrades worst (U-curve effect).
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70",
+    # Cap bash output before it enters context (hook fires after — this is faster)
+    "BASH_MAX_OUTPUT_LENGTH": "20000",
+    # Cap MCP tool output
+    "MAX_MCP_OUTPUT_TOKENS": "8000",
+}
 
 # Load existing settings or start fresh
 if os.path.exists(settings_path):
@@ -71,7 +89,17 @@ else:
     settings = {}
 
 settings.setdefault("hooks", {})
+settings.setdefault("env", {})
 
+# Register env vars (only if not already set by user)
+for key, value in ENV_DEFAULTS.items():
+    if key not in settings["env"]:
+        settings["env"][key] = value
+        print(f"  [✓] env.{key}={value}")
+    else:
+        print(f"  [~] env.{key} already set ({settings['env'][key]})")
+
+# Register hooks
 for hook_def in HOOKS_TO_REGISTER:
     event   = hook_def["event"]
     marker  = hook_def["marker"]

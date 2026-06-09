@@ -50,7 +50,15 @@ echo "  [✓] db/ (FTS5 schema + scripts)"
 mkdir -p "$TARGET/hooks"
 cp "$RULES_DIR/hooks/"*.sh "$TARGET/hooks/"
 chmod +x "$TARGET/hooks/"*.sh
-echo "  [✓] hooks/ (session-start, inject-rules, pre-tool-guard, post-tool-trim, context-guard)"
+echo "  [✓] hooks/ (session-start, inject-rules, pre-tool-guard, post-tool-trim, pre-compact, context-guard)"
+
+# 5b. .claudeignore — de-prioritize noisy directories for proactive scanning
+if [[ ! -f "$TARGET/.claudeignore" ]]; then
+  cp "$RULES_DIR/templates/.claudeignore" "$TARGET/.claudeignore"
+  echo "  [✓] .claudeignore (from template — edit to match your project)"
+else
+  echo "  [~] .claudeignore already exists — skipping"
+fi
 
 # 6. scripts/ — project snapshot generator
 mkdir -p "$TARGET/scripts"

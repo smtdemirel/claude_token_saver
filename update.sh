@@ -77,6 +77,13 @@ chmod +x "$TARGET/hooks/"*.sh
 mkdir -p "$TARGET/scripts"
 cp "$RULES_DIR/scripts/snapshot.sh" "$TARGET/scripts/snapshot.sh"
 chmod +x "$TARGET/scripts/snapshot.sh"
+
+# .claudeignore — only copy if target doesn't have one
+if [[ ! -f "$TARGET/.claudeignore" ]]; then
+  cp "$RULES_DIR/templates/.claudeignore" "$TARGET/.claudeignore"
+  echo "  [✓] .claudeignore (created from template)"
+fi
+
 bash "$TARGET/scripts/snapshot.sh" "$TARGET"
 bash "$TARGET/hooks/setup-hooks.sh" "$TARGET"
 echo "  [✓] hooks/ + scripts/ updated and registered"
