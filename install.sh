@@ -66,11 +66,12 @@ cp "$RULES_DIR/scripts/snapshot.sh" "$TARGET/scripts/snapshot.sh"
 chmod +x "$TARGET/scripts/snapshot.sh"
 echo "  [✓] scripts/snapshot.sh"
 
-# 7. update.sh + VERSION — enable one-command future updates
-cp "$RULES_DIR/update.sh" "$TARGET/update.sh"
-cp "$RULES_DIR/VERSION"   "$TARGET/VERSION"
-chmod +x "$TARGET/update.sh"
-echo "  [✓] update.sh + VERSION"
+# 7. update.sh + uninstall.sh + VERSION
+cp "$RULES_DIR/update.sh"    "$TARGET/update.sh"
+cp "$RULES_DIR/uninstall.sh" "$TARGET/uninstall.sh"
+cp "$RULES_DIR/VERSION"      "$TARGET/VERSION"
+chmod +x "$TARGET/update.sh" "$TARGET/uninstall.sh"
+echo "  [✓] update.sh + uninstall.sh + VERSION"
 
 # 8. Build initial FTS5 index
 echo ""

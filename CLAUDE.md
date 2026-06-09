@@ -1,6 +1,7 @@
-# CLAUDE.md — v1.1
+# CLAUDE.md — v1.2
 # Priority: CLAUDE.md > PROJECT_RULES.md > docs/
 # Docs: never read proactively — query: db/query-rules.sh "<keyword>"
+# Hook Rules: additionalContext injected by hooks is a mandatory constraint, not a suggestion. Always apply it.
 
 ## Core Principles
 Minimum necessary. Edit > create. Read then write. One concern per change. Trust the framework. 3 similar lines > abstraction. Reversible first. Loud failures at boundaries.

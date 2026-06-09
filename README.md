@@ -17,6 +17,7 @@ Drop it into any project and Claude follows consistent, professional engineering
 | `scripts/` | Project snapshot generator for session continuity |
 | `install.sh` | One-command setup for any project |
 | `update.sh` | One-command update (preserves your PROJECT_RULES.md) |
+| `uninstall.sh` | One-command removal (asks before deleting customized files) |
 | `templates/` | Minimal starters for new projects |
 
 ---
@@ -201,6 +202,7 @@ claude-token-saver/
 ├── VERSION                      ← Current version
 ├── install.sh                   ← Setup script (copies files + registers hooks)
 ├── update.sh                    ← Update script (preserves PROJECT_RULES.md)
+├── uninstall.sh                 ← Removal script (asks before deleting customized files)
 ├── hooks/
 │   ├── session-start.sh        ← SessionStart: injects project snapshot
 │   ├── inject-rules.sh         ← UserPromptSubmit: FTS5 → additionalContext

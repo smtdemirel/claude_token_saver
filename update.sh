@@ -66,9 +66,10 @@ mkdir -p "$TARGET/db"
 cp "$RULES_DIR/db/schema.sql"       "$TARGET/db/schema.sql"
 cp "$RULES_DIR/db/build-index.sh"   "$TARGET/db/build-index.sh"
 cp "$RULES_DIR/db/query-rules.sh"   "$TARGET/db/query-rules.sh"
-cp "$RULES_DIR/update.sh"           "$TARGET/update.sh"
+cp "$RULES_DIR/update.sh"            "$TARGET/update.sh"
+cp "$RULES_DIR/uninstall.sh"        "$TARGET/uninstall.sh"
 cp "$RULES_DIR/VERSION"             "$TARGET/VERSION" 2>/dev/null || true
-chmod +x "$TARGET/db/build-index.sh" "$TARGET/db/query-rules.sh" "$TARGET/update.sh"
+chmod +x "$TARGET/db/build-index.sh" "$TARGET/db/query-rules.sh" "$TARGET/update.sh" "$TARGET/uninstall.sh"
 echo "  [✓] db/ scripts updated"
 
 mkdir -p "$TARGET/hooks"
