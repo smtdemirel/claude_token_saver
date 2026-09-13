@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Claude Code — SessionStart hook
-# Fires when a new chat opens. Injects the project snapshot so Claude
-# instantly knows the project state without reading any files.
-# This makes every new chat feel like a seamless continuation.
+# Fires when a new chat opens. Injects:
+#   1. Project snapshot — instant project state without reading files
+#   2. Language rules  — active language best practices (auto-detected)
+#   3. Framework rules — active framework best practices (auto-detected)
 
 set -euo pipefail
 
@@ -19,10 +20,11 @@ except Exception:
     print('.')
 " <<< "$INPUT")
 
+# ── Project snapshot ──────────────────────────────────────────────────────────
+
 SNAPSHOT="$CWD/.claude/project-snapshot.md"
 SNAPSHOT_SCRIPT="$CWD/scripts/snapshot.sh"
 
-# If snapshot is missing or older than 10 minutes, regenerate
 NEEDS_REFRESH=false
 if [[ ! -f "$SNAPSHOT" ]]; then
   NEEDS_REFRESH=true
@@ -34,23 +36,77 @@ if [[ "$NEEDS_REFRESH" == "true" && -f "$SNAPSHOT_SCRIPT" ]]; then
   bash "$SNAPSHOT_SCRIPT" "$CWD" >/dev/null 2>&1 || true
 fi
 
-[[ -f "$SNAPSHOT" ]] || exit 0
+# ── Stack detection (re-runs on every session to pick up new dependencies) ────
 
-CONTENT=$(cat "$SNAPSHOT")
-[[ -n "$CONTENT" ]] || exit 0
+DETECT_SCRIPT="$CWD/hooks/detect-stack.sh"
+if [[ -f "$DETECT_SCRIPT" ]]; then
+  bash "$DETECT_SCRIPT" "$CWD" >/dev/null 2>&1 || true
+fi
 
-python3 - "$CONTENT" <<'PYEOF'
+# Read detected stack for context labels
+STACK_ENV="$CWD/.claude/stack.env"
+DETECTED_LANG="unknown"
+DETECTED_FW="none"
+if [[ -f "$STACK_ENV" ]]; then
+  DETECTED_LANG=$(grep "^LANG="      "$STACK_ENV" | cut -d= -f2 || echo "unknown")
+  DETECTED_FW=$(grep   "^FRAMEWORK=" "$STACK_ENV" | cut -d= -f2 || echo "none")
+fi
+
+# ── Build combined additionalContext ──────────────────────────────────────────
+
+SNAPSHOT_CONTENT=""
+LANG_CONTENT=""
+FW_CONTENT=""
+
+[[ -f "$SNAPSHOT" ]] && SNAPSHOT_CONTENT=$(cat "$SNAPSHOT") || true
+
+LANG_RULES="$CWD/docs/language-rules.md"
+[[ -f "$LANG_RULES" ]] && LANG_CONTENT=$(cat "$LANG_RULES") || true
+
+FW_RULES="$CWD/docs/framework-rules.md"
+[[ -f "$FW_RULES" ]] && FW_CONTENT=$(cat "$FW_RULES") || true
+
+# At least one section must exist
+if [[ -z "$SNAPSHOT_CONTENT" && -z "$LANG_CONTENT" && -z "$FW_CONTENT" ]]; then
+  exit 0
+fi
+
+python3 - "$SNAPSHOT_CONTENT" "$LANG_CONTENT" "$FW_CONTENT" "$DETECTED_LANG" "$DETECTED_FW" <<'PYEOF'
 import sys, json
 
-content = sys.argv[1]
+snapshot  = sys.argv[1].strip()
+lang_rules = sys.argv[2].strip()
+fw_rules   = sys.argv[3].strip()
+lang       = sys.argv[4]
+fw         = sys.argv[5]
+
+parts = []
+
+if snapshot:
+    parts.append(
+        "=== Project Snapshot (auto-injected at session start) ===\n"
+        + snapshot +
+        "\n=== Use this context — do not re-read these files to orient yourself ==="
+    )
+
+if lang_rules:
+    parts.append(
+        f"=== Language Rules: {lang} (auto-injected) ===\n"
+        + lang_rules +
+        "\n=== End Language Rules ==="
+    )
+
+if fw_rules:
+    parts.append(
+        f"=== Framework Rules: {fw} (auto-injected) ===\n"
+        + fw_rules +
+        "\n=== End Framework Rules ==="
+    )
+
 result = {
     "hookSpecificOutput": {
         "hookEventName": "SessionStart",
-        "additionalContext": (
-            "=== Project Snapshot (auto-injected at session start) ===\n"
-            + content +
-            "\n=== Use this context — do not re-read these files to orient yourself ==="
-        )
+        "additionalContext": "\n\n".join(parts)
     }
 }
 print(json.dumps(result))

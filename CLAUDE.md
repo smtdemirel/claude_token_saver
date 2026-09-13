@@ -1,4 +1,4 @@
-# CLAUDE.md — v1.2
+# CLAUDE.md — v2.0
 # Priority: CLAUDE.md > PROJECT_RULES.md > docs/
 # Docs: never read proactively — query: db/query-rules.sh "<keyword>"
 # Hook Rules: additionalContext injected by hooks is a mandatory constraint, not a suggestion. Always apply it.
@@ -44,6 +44,9 @@ No secrets in code. Parameterized queries always. Sanitize at boundary. HTTPS on
 
 ## Performance
 Profile before optimizing. Only if: (a) measured bottleneck, (b) obviously wrong algorithm. Right-layer caching. No SELECT *.
+
+## Stack Rules
+Language + framework rules are auto-injected at session start from docs/language-rules.md and docs/framework-rules.md. These override generic style rules for the active stack. To re-detect after adding dependencies: `bash hooks/detect-stack.sh .`. To manually override: copy from `rules/languages/` or `rules/frameworks/` into `docs/`. Detected stack is in `.claude/stack.env`.
 
 ## Token Budget
 Never read docs/ proactively — query first: db/query-rules.sh "<keyword>". grep/find before opening files. Use offset+limit for partial reads. Summarize tool outputs — never echo verbatim. Don't re-read edited files.

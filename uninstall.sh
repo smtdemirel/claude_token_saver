@@ -31,8 +31,8 @@ import sys, json, os
 settings_path = sys.argv[1]
 
 OUR_MARKERS = [
-    "session-start", "inject-rules", "pre-tool-guard",
-    "post-tool-trim", "pre-compact", "context-guard",
+    "session-start", "inject-rules", "detect-stack",
+    "pre-tool-guard", "post-tool-trim", "pre-compact", "context-guard",
 ]
 
 OUR_ENV_KEYS = [
@@ -88,7 +88,7 @@ fi
 
 # ── Step 2: Remove installed directories ──────────────────────────────────────
 
-for dir in docs db hooks scripts; do
+for dir in docs db hooks scripts rules; do
   if [[ -d "$TARGET/$dir" ]]; then
     rm -rf "$TARGET/$dir"
     echo "  [✓] $dir/ removed"
@@ -133,8 +133,9 @@ fi
 # ── Step 6: Clean up .claude/ if now empty ────────────────────────────────────
 
 if [[ -d "$TARGET/.claude" ]]; then
-  # Remove auto-generated snapshot; leave user files
+  # Remove auto-generated files; leave user files (settings.json, keybindings, etc.)
   rm -f "$TARGET/.claude/project-snapshot.md"
+  rm -f "$TARGET/.claude/stack.env"
   # Remove .claude/ dir only if empty
   if [[ -z "$(ls -A "$TARGET/.claude" 2>/dev/null)" ]]; then
     rmdir "$TARGET/.claude"
